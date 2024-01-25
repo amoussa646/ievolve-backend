@@ -26,8 +26,17 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
           
           
-      - name: Push Docker image
-        run: docker push opeth646/ievolve
+      -
+        name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      -
+        name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/ievolve
  
 
       
