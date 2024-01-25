@@ -20,4 +20,4 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
           logout: true
       - name: Push Docker image to Docker Hub
-        run: docker push my-image-name:$(date +%s)
+        run: docker push ievolve-backend-fastapi-app:$(date +%s)
