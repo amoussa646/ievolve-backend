@@ -27,6 +27,7 @@ jobs:
           
           
       - name: Push Docker image
-        run: docker push docker.io/opeth646/ievolve:latest 
+        run: docker push opeth646/ievolve
+ 
 
       
