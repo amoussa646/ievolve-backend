@@ -3,7 +3,7 @@ name: CI/CD Pipeline
 on:
   push:
     branches:
-      - origin  # Adjust the branch name as needed
+      - master  # Adjust the branch name as needed
 
 jobs:
   build:
