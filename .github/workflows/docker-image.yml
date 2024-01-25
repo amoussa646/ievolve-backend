@@ -27,6 +27,6 @@ jobs:
           
           
       - name: Push Docker image
-        run: docker push ievolve-backend-fastapi-app:latest
+        run: docker push opeth646/ievolve-backend-fastapi-app:latest .
 
       
