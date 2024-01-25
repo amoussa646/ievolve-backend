@@ -14,7 +14,7 @@ class AccessTokenResponse(BaseResponse):
     refresh_token_expires_at: int
     refresh_token_issued_at: int
 
-###############
+####################
 class UserResponse(BaseResponse):
     id: str
     email: str
