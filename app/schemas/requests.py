@@ -1,6 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
-
+from datetime import datetime
+from datetime import date
 
 class BaseRequest(BaseModel):
     # may define additional fields or config shared across requests
@@ -36,11 +37,21 @@ class UserCreateRequest(BaseRequest):
     
 class ActivityCreateRequest(BaseRequest):
     start: str
-    
+    date:str
+
+class ActivitySchema(BaseModel):
+    id:  Optional[str] = None
+    user_id:  Optional[str] = None
+    date:  Optional[str] = None
+    start: Optional[str] = None
+    end: Optional[str] = None
+    activity: Optional[str] = None
+
 class ActivityEndRequest(BaseRequest):
     id: str
     end: str
     activity: str
+    duration: str
 
 class ItemCreateRequest(BaseModel):
     name: str

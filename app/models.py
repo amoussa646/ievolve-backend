@@ -16,9 +16,10 @@ alembic upgrade head
 import uuid
 from typing import List
 
-from sqlalchemy import String, Boolean, DateTime, ForeignKey, Integer, JSON,ARRAY
+from sqlalchemy import String, Boolean, DateTime, ForeignKey, Integer, JSON,ARRAY, Date, Time
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from datetime import datetime
 
 
 class Base(DeclarativeBase):
@@ -63,16 +64,16 @@ class Activity(Base):
     __tablename__ = "activity"
 
     id: Mapped[str] = mapped_column(
-        UUID(as_uuid=False), primary_key=True, default=lambda _: str(uuid.uuid4())
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
     user_id: Mapped[str] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey("users.id", ondelete="CASCADE")
     )
-    start: Mapped[str] = mapped_column(String(128), nullable=True)
-    end: Mapped[str] = mapped_column(String(128), nullable=True)
-    activity: Mapped[str] = mapped_column(String(20), nullable=True)
-    
-
+    date: Mapped[str] = mapped_column(Date,nullable=True)  # New date column for activity date
+    start: Mapped[str] = mapped_column(Time,nullable=True)  # Adjusted to Time type
+    end: Mapped[str] = mapped_column(Time,nullable=True)  # Adjusted to Time type
+    activity: Mapped[str] = mapped_column(String(20),nullable=True)
+    duration: Mapped[str] = mapped_column(Integer,nullable=True)
 # class Item(Base):
 #     __tablename__ = "item"
 

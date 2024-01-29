@@ -23,7 +23,7 @@ async def read_current_user(
         first_name= current_user.first_name,
         last_name = current_user.last_name,
         email=current_user.email,
-        name=current_user.first_name + " " + current_user.last_name,
+        name = (current_user.first_name if current_user.first_name else "") + " " + (current_user.last_name if current_user.last_name else ""),
         phone_number=current_user.phone_number,
         address= current_user.address
         

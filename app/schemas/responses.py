@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
 from typing import List, Optional
-
+from uuid import UUID
+from datetime import time,date
 class BaseResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -24,10 +25,16 @@ class UserResponse(BaseResponse):
     address:Optional[str]=""
 
 class ActivityResponse(BaseResponse):
-    id: Optional[str]=""
-    start: Optional[str]=""
-    end:Optional[str]=""
+    id: Optional[UUID]=None
+    start: Optional[time]=None
+    end:Optional[time]=None
     activity:  Optional[str]=""
+
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+
    
 
 
