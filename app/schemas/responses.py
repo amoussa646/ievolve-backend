@@ -29,7 +29,7 @@ class ActivityResponse(BaseResponse):
     start: Optional[time]=None
     end:Optional[time]=None
     activity:  Optional[str]=""
-
+    date: Optional[str]=None
     class Config:
         orm_mode = True
         from_attributes = True

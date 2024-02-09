@@ -132,9 +132,8 @@ async def get_last_activity_for_user(
     query = query.order_by(Activity.id.desc()).limit(1)
 
     result = await session.execute(query)
-    last_activity = result.scalar_one_or_none()
-
-    if last_activity is None:
+    result = result.scalar_one_or_none()
+    if result is None:
         raise HTTPException(status_code=201, detail="No activities found for the user")
 
     # Optionally filter the fields of the response
@@ -144,7 +143,7 @@ async def get_last_activity_for_user(
         # and selecting only the keys that match the `fields` parameter.
         pass
 
-    return last_activity
+    return result
 
 @router.get("/month", response_model=float)  # Adjust the response model as needed
 async def get_activity_month(
