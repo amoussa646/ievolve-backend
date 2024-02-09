@@ -83,7 +83,7 @@ async def end_activity(
         existing_activity = result.scalar_one_or_none()
         
         if existing_activity is None:
-            raise HTTPException(status_code=201, detail="Activity not found")
+            return []
         try:
             end_time = datetime.strptime(activity_end.end, "%H:%M").time()
         except ValueError:
@@ -114,12 +114,10 @@ async def end_activity(
 #         raise HTTPException(status_code=404, detail="No activities found for the user")
 
 #     return last_activity
-
 @router.get("/filter", response_model=ActivityResponse)
 async def get_last_activity_for_user(
-    user_id: str,  # Changed from int to str to accommodate UUIDs
+    user_id: str,
     activity_date: Optional[str] = None,
-    fields: Optional[str] = None,
     session: AsyncSession = Depends(deps.get_session),
 ):
     query = select(Activity).where(Activity.user_id == user_id)
@@ -128,22 +126,14 @@ async def get_last_activity_for_user(
     if activity_date:
         query = query.filter(cast(Activity.date, Date) == cast(activity_date, Date))
 
-    # Order by ID or timestamp to get the last activity
-    query = query.order_by(Activity.id.desc()).limit(1)
-
     result = await session.execute(query)
-    result = result.scalar_one_or_none()
-    if result is None:
-        raise HTTPException(status_code=201, detail="No activities found for the user")
+    activities = result.scalars().all()
 
-    # Optionally filter the fields of the response
-    if fields:
-        # Implement the logic to filter the response based on the requested fields
-        # This might involve transforming the `last_activity` object into a dictionary
-        # and selecting only the keys that match the `fields` parameter.
-        pass
+    if not activities:
+        return []
 
-    return result
+    # Return the last activity
+    return ActivityResponse.from_orm(activities[-1])
 
 @router.get("/month", response_model=float)  # Adjust the response model as needed
 async def get_activity_month(
@@ -173,7 +163,7 @@ async def get_activity_month(
     total_month = result.scalar_one_or_none()
 
     if total_month is None:
-        raise HTTPException(status_code=201, detail="No activities found for the user in the specified date range")
+        return 0
 
     return total_month
 
@@ -192,7 +182,7 @@ async def get_recent_activity(
     activity = result.scalar_one_or_none()
 
     if activity is None:
-        raise HTTPException(status_code=201, detail="No matching activity found")
+        return 0
 
     return activity
 # @router.delete("/me", status_code=204)

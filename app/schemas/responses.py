@@ -1,7 +1,9 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
 from typing import List, Optional
 from uuid import UUID
-from datetime import time,date
+from datetime import time
+from datetime import  date as datex
+
 class BaseResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -29,7 +31,7 @@ class ActivityResponse(BaseResponse):
     start: Optional[time]=None
     end:Optional[time]=None
     activity:  Optional[str]=""
-    date: Optional[str]=None
+    date: Optional[datex]=""
     class Config:
         orm_mode = True
         from_attributes = True
