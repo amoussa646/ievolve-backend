@@ -3,6 +3,8 @@ from typing import List, Optional
 from datetime import datetime
 from datetime import date
 
+from app.models import Activity
+
 class BaseRequest(BaseModel):
     # may define additional fields or config shared across requests
     pass
@@ -38,6 +40,13 @@ class UserCreateRequest(BaseRequest):
 class ActivityCreateRequest(BaseRequest):
     start: str
     date:str
+class DayPlanCreateRequest(BaseRequest):
+    date:str
+class DayPlanSchema(BaseModel):
+    id:  Optional[str] = None
+    user_id:  Optional[str] = None
+    date:  Optional[str] = None
+    dayplan :Optional[list["Activity"] ]="" 
 
 class ActivitySchema(BaseModel):
     id:  Optional[str] = None

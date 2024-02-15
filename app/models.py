@@ -59,7 +59,6 @@ class User(Base):
     last_login: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
     new_user: Mapped[bool] = mapped_column(Boolean, nullable=True)
-
 class Activity(Base):
     __tablename__ = "activity"
 
@@ -69,11 +68,38 @@ class Activity(Base):
     user_id: Mapped[str] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE")
     )
-    date: Mapped[str] = mapped_column(Date,nullable=True)  # New date column for activity date
-    start: Mapped[str] = mapped_column(Time,nullable=True)  # Adjusted to Time type
-    end: Mapped[str] = mapped_column(Time,nullable=True)  # Adjusted to Time type
-    activity: Mapped[str] = mapped_column(String(20),nullable=True)
-    duration: Mapped[str] = mapped_column(Integer,nullable=True)
+    day_plan_id: Mapped[str | None] = mapped_column(
+        ForeignKey("day_plan.id"), nullable=True  # Allows Activity to exist without a DayPlan
+    )
+    date: Mapped[Date] = mapped_column(Date, nullable=True)
+    start: Mapped[Time] = mapped_column(Time, nullable=True)
+    end: Mapped[Time] = mapped_column(Time, nullable=True)
+    activity: Mapped[str] = mapped_column(String(20), nullable=True)
+    duration: Mapped[int] = mapped_column(Integer, nullable=True)
+
+    # Relationship back to DayPlan, nullable to allow activities with no day plans
+    day_plan: Mapped["DayPlan"] = relationship("DayPlan", back_populates="activities")
+
+class DayPlan(Base):
+    __tablename__ = "day_plan"
+
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE")
+    )
+    date: Mapped[Date] = mapped_column(Date, nullable=True)
+
+    # Relationship to Activity
+    dayplan: Mapped[list["Activity"]] = relationship("Activity", back_populates="day_plan", cascade="all, delete-orphan") 
+    full_score:Mapped[int] = mapped_column(Integer, nullable=True)
+    total_score:Mapped[int] = mapped_column(Integer, nullable=True)
+    # New date column for activity date
+    # start: Mapped[str] = mapped_column(Time,nullable=True)  # Adjusted to Time type
+    # end: Mapped[str] = mapped_column(Time,nullable=True)  # Adjusted to Time type
+    # activity: Mapped[str] = mapped_column(String(20),nullable=True)
+    # duration: Mapped[str] = mapped_column(Integer,nullable=True)
 # class Item(Base):
 #     __tablename__ = "item"
 

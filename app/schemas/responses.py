@@ -4,6 +4,8 @@ from uuid import UUID
 from datetime import time
 from datetime import  date as datex
 
+from app.models import Activity
+
 class BaseResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -32,6 +34,16 @@ class ActivityResponse(BaseResponse):
     end:Optional[time]=None
     activity:  Optional[str]=""
     date: Optional[datex]=""
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+class DayPlanResponse(BaseResponse):
+    id: Optional[UUID]=None
+    dayplan:  Optional[list["Activity"] ]=""
+    date: Optional[datex]=""
+    total_score:Optional[int]=""
+    full_score:Optional[int]=""
     class Config:
         orm_mode = True
         from_attributes = True

@@ -98,22 +98,7 @@ async def end_activity(
         existing_activity.duration = duration_int
         await session.commit()
         return existing_activity
-    
 
-# @router.get("/activity/{user_id}/last_activity", response_model=ActivityResponse)
-# async def get_last_activity_for_user(
-#     user_id: int,
-#     session: AsyncSession = Depends(deps.get_session),
-# ):
-#     # Query to find the most recent activity for the specified user
-#     stmt = select(Activity).where(Activity.user_id == user_id).order_by(Activity.id.desc()).limit(1)
-#     result = await session.execute(stmt)
-#     last_activity = result.scalar_one_or_none()
-
-#     if last_activity is None:
-#         raise HTTPException(status_code=404, detail="No activities found for the user")
-
-#     return last_activity
 @router.get("/filter", response_model=ActivityResponse)
 async def get_last_activity_for_user(
     user_id: str,
@@ -185,6 +170,22 @@ async def get_recent_activity(
         return 0
 
     return activity
+    
+
+# @router.get("/activity/{user_id}/last_activity", response_model=ActivityResponse)
+# async def get_last_activity_for_user(
+#     user_id: int,
+#     session: AsyncSession = Depends(deps.get_session),
+# ):
+#     # Query to find the most recent activity for the specified user
+#     stmt = select(Activity).where(Activity.user_id == user_id).order_by(Activity.id.desc()).limit(1)
+#     result = await session.execute(stmt)
+#     last_activity = result.scalar_one_or_none()
+
+#     if last_activity is None:
+#         raise HTTPException(status_code=404, detail="No activities found for the user")
+
+#     return last_activity
 # @router.delete("/me", status_code=204)
 # async def delete_current_chef(
 #     current_chef: Chef = Depends(deps.get_current_chef),
