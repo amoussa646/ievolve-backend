@@ -42,11 +42,15 @@ class ActivityCreateRequest(BaseRequest):
     date:str
 class DayPlanCreateRequest(BaseRequest):
     date:str
+class HabitCreateRequest(BaseRequest):
+    name:str
 class DayPlanSchema(BaseModel):
     id:  Optional[str] = None
     user_id:  Optional[str] = None
     date:  Optional[str] = None
     dayplan :Optional[list["Activity"] ]="" 
+    class Config:
+        arbitrary_types_allowed = True
 
 class ActivitySchema(BaseModel):
     id:  Optional[str] = None
@@ -55,6 +59,8 @@ class ActivitySchema(BaseModel):
     start: Optional[str] = None
     end: Optional[str] = None
     activity: Optional[str] = None
+    class Config:
+        arbitrary_types_allowed = True
 
 class ActivityEndRequest(BaseRequest):
     id: str

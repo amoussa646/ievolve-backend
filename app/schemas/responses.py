@@ -35,8 +35,8 @@ class ActivityResponse(BaseResponse):
     activity:  Optional[str]=""
     date: Optional[datex]=""
     class Config:
-        orm_mode = True
         from_attributes = True
+        arbitrary_types_allowed = True
 
 class DayPlanResponse(BaseResponse):
     id: Optional[UUID]=None
@@ -45,9 +45,11 @@ class DayPlanResponse(BaseResponse):
     total_score:Optional[int]=""
     full_score:Optional[int]=""
     class Config:
-        orm_mode = True
         from_attributes = True
+        arbitrary_types_allowed = True
 
+class HabitResponse(BaseResponse):
+    name: Optional[str]=""
 
    
 

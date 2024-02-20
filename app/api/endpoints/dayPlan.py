@@ -66,9 +66,9 @@ async def get_dayplan_for_date(
     dayplan = result.scalars().all()
 
     if not dayplan:
-        return[]
-    return DayPlanResponse.from_orm(dayplan[-1])
-@router.put("/{dayplan_id}", response_model=DayPlanResponse)
+        return {}
+    return DayPlanResponse(dayplan[-1])
+@router.put("", response_model=DayPlanResponse)
 async def edit_dayplan(
     dayplan_id: str,
     dayplan_update: DayPlanCreateRequest,  # This Pydantic model should represent the editable fields of a DayPlan
