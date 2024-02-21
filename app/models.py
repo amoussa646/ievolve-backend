@@ -86,7 +86,6 @@ class DayPlan(Base):
     date: Mapped[Date] = mapped_column(Date, nullable=True)
 
     # Relationship to Activity
-    dayplan: Mapped[list["Activity"]] = relationship("Activity", back_populates="day_plan", cascade="all, delete-orphan") 
     full_score:Mapped[int] = mapped_column(Integer, nullable=True)
     total_score:Mapped[int] = mapped_column(Integer, nullable=True)
     # New date column for activity date

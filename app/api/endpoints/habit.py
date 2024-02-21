@@ -10,7 +10,7 @@ from datetime import date
 from typing import Optional
 from app.api import deps
 from app.core.security import get_password_hash
-from app.models import User, DayPlanm ,Habit
+from app.models import User, DayPlan ,Habit
 from app.schemas.requests import DayPlanCreateRequest,DayPlanSchema, HabitCreateRequest
 from app.schemas.responses import DayPlanResponse, HabitResponse
 from datetime import date
@@ -27,15 +27,15 @@ async def create_habit(
 
   
     new_habit = Habit(
-        user_id=current_user.id,
-        name = habit_create.name
+        user_id=current_user.id,        name = habit_create.name
          # Assuming start is already a time or string that your model can handle
     )
     session.add(new_habit)
     await session.commit()
     return {
-       new_habit
+      "name": new_habit.name
     }
+
 # @router.get("", response_model=DayPlanResponse)
 # async def get_dayplan_for_date(
 #     user_id: str,
