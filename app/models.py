@@ -16,8 +16,8 @@ alembic upgrade head
 import uuid
 from typing import List
 
-from sqlalchemy import String, Boolean, DateTime, ForeignKey, Integer, JSON,ARRAY, Date, Time
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer, JSON,ARRAY, Date, Time
+from sqlalchemy.dialects.postgresql import UUID , JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from datetime import datetime
 
@@ -84,7 +84,7 @@ class DayPlan(Base):
         ForeignKey("users.id", ondelete="CASCADE")
     )
     date: Mapped[Date] = mapped_column(Date, nullable=True)
-
+    dayplan = Column(JSONB, nullable=True)
     # Relationship to Activity
     full_score:Mapped[int] = mapped_column(Integer, nullable=True)
     total_score:Mapped[int] = mapped_column(Integer, nullable=True)

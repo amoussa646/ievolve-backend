@@ -1,4 +1,3 @@
-
 # from typing import List
 # from fastapi import APIRouter, Depends, HTTPException
 # from sqlalchemy import delete, select,func
@@ -86,20 +85,33 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.api import deps
-from app.models import Habit
+from app.models import Habit, User
 from app.schemas.responses import HabitResponse
 from app.schemas.requests import HabitCreateRequest
+from sqlalchemy import delete, select,func
 
 router = APIRouter()
 
+
+@router.get("", response_model=List[HabitResponse])
+async def get_all_habits(
+    session: AsyncSession = Depends(deps.get_session),
+    current_user: User = Depends(deps.get_current_user)
+):
+    # Query the database for all habits where the user_id matches the current user's id
+    user_habits = await session.execute(select(Habit).where(Habit.user_id == current_user.id))
+    habits = user_habits.scalars().all()
+    return habits
 @router.post("", response_model=HabitResponse)
 async def create_habit(
     habit_create: HabitCreateRequest,
-    session: AsyncSession = Depends(deps.get_session)
+    session: AsyncSession = Depends(deps.get_session),
+    current_user: User = Depends(deps.get_current_user),
+
 ):
     new_habit = Habit(
         name=habit_create.name,
-        user_id=habit_create.user_id  # Ensure the user_id is passed in the request
+        user_id=current_user.id  # Ensure the user_id is passed in the request
     )
     session.add(new_habit)
     await session.commit()
@@ -112,7 +124,9 @@ async def create_habit(
 @router.put("", response_model=List[HabitResponse])
 async def update_habits(
     habits: List[HabitCreateRequest],
-    session: AsyncSession = Depends(deps.get_session)
+    session: AsyncSession = Depends(deps.get_session),
+    current_user: User = Depends(deps.get_current_user),
+
 ):
     updated_habits = []
     for habit_data in habits:
@@ -132,7 +146,7 @@ async def update_habits(
 @router.delete("/{habit_id}")
 async def delete_habit(
     habit_id: int,
-    session: AsyncSession = Depends(deps.get_session)
+    session: AsyncSession = Depends(deps.get_session),
 ):
     habit = await session.get(Habit, habit_id)
     if not habit:

@@ -49,8 +49,9 @@ class DayPlanResponse(BaseResponse):
         arbitrary_types_allowed = True
 
 class HabitResponse(BaseResponse):
-    name: Optional[str]=""
-
+     id:  Optional[UUID]=None
+     name: Optional[str]=""
+     frequency: Optional[str]=""
    
 
 

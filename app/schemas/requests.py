@@ -43,6 +43,7 @@ class ActivityCreateRequest(BaseRequest):
 class DayPlanCreateRequest(BaseRequest):
     date:str
 class HabitCreateRequest(BaseModel):
+    id: Optional[str]
     name: str
     user_id: Optional[int] = None  # Assuming user_id is optional for creating a habit
 
