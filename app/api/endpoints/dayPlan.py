@@ -11,7 +11,7 @@ from typing import Optional
 from app.api import deps
 from app.core.security import get_password_hash
 from app.models import User, DayPlan
-from app.schemas.requests import DayPlanCreateRequest,DayPlanSchema
+from app.schemas.requests import DayPlanSchema
 from app.schemas.responses import DayPlanResponse
 from datetime import date,datetime
 
@@ -19,7 +19,7 @@ from datetime import date,datetime
 router = APIRouter()
 @router.post("", response_model=DayPlanResponse)
 async def create_dayplan(
-    dayplan_create: DayPlanCreateRequest,
+    dayplan_create: DayPlanSchema,
     session: AsyncSession = Depends(deps.get_session),
     current_user: User = Depends(deps.get_current_user),
 ):
@@ -62,31 +62,39 @@ async def get_dayplan_for_date(
     if not dayplan:
         return {}
     return DayPlanResponse.from_orm(dayplan[-1])
+
+
+
+
+def serialize_activity(activity):
+    # Convert 'start' and 'end' to ISO 8601 string format
+    return {
+        'start': activity.start.isoformat() if isinstance(activity.start, datetime) else activity.start,
+        'end': activity.end.isoformat() if isinstance(activity.end, datetime) else activity.end,
+        'activity': activity.activity
+    }
+
 @router.put("", response_model=DayPlanResponse)
 async def edit_dayplan(
     dayplan_id: str,
-    dayplan_update: DayPlanCreateRequest,  # This Pydantic model should represent the editable fields of a DayPlan
+    dayplan_update: DayPlanSchema,  # This Pydantic model should represent the editable fields of a DayPlan
     session: AsyncSession = Depends(deps.get_session),
     current_user: User = Depends(deps.get_current_user),
 ):
-    # Convert dayplan_id to a UUID object if necessary
     try:
-        # Attempt to fetch the specific DayPlan instance by ID
-        query = select(DayPlan).filter_by(id=dayplan_id, user_id=current_user.id)
+        query = select(DayPlan).filter(DayPlan.id == dayplan_id, DayPlan.user_id == current_user.id)
         result = await session.execute(query)
         dayplan = result.scalars().one()
-    except :
-        raise HTTPException(status_code=404, detail="DayPlan not found")
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="DayPlan not found") from e
 
-    # Update the DayPlan instance with the provided data
-    for var, value in vars(dayplan_update).items():
-        setattr(dayplan, var, value) if value else None
-    date_obj = datetime.strptime(dayplan_update.date, '%Y-%m-%d')
+    # Serialize 'dayplan' field if present
+    if dayplan_update.dayplan is not None:
+        serialized_dayplan = [serialize_activity(activity) for activity in dayplan_update.dayplan]
+        dayplan.dayplan = serialized_dayplan
 
-# Update the DayPlan instance with the converted date object
-    dayplan.date = date_obj.date()
-    session.add(dayplan)
     await session.commit()
     await session.refresh(dayplan)
 
     return dayplan
+

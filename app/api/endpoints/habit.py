@@ -1,86 +1,3 @@
-# from typing import List
-# from fastapi import APIRouter, Depends, HTTPException
-# from sqlalchemy import delete, select,func
-# from sqlalchemy import cast, Numeric, Date
-# from datetime import datetime
-
-# from sqlalchemy.ext.asyncio import AsyncSession
-# from datetime import date
-# from typing import Optional
-# from app.api import deps
-# from app.core.security import get_password_hash
-# from app.models import User, DayPlan ,Habit
-# from app.schemas.requests import DayPlanCreateRequest,DayPlanSchema, HabitCreateRequest
-# from app.schemas.responses import DayPlanResponse, HabitResponse
-# from datetime import date
-
-
-# router = APIRouter()
-
-# @router.post("", response_model=HabitResponse)
-# async def create_habit(
-#     habit_create: HabitCreateRequest,
-#     session: AsyncSession = Depends(deps.get_session),
-#     current_user: User = Depends(deps.get_current_user),
-# ):
-
-  
-#     new_habit = Habit(
-#         user_id=current_user.id,        name = habit_create.name
-#          # Assuming start is already a time or string that your model can handle
-#     )
-#     session.add(new_habit)
-#     await session.commit()
-#     return {
-#       "name": new_habit.name
-#     }
-
-# @router.get("", response_model=DayPlanResponse)
-# async def get_dayplan_for_date(
-#     user_id: str,
-#     dayplan_date: str,
-#     session: AsyncSession = Depends(deps.get_session)
-# ):
-#     try:
-#         date_obj = datetime.strptime(dayplan_date, "%Y-%m-%d").date()
-#     except ValueError:
-#         raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD.")
-
-#     query = select(DayPlan).where(
-#         DayPlan.user_id == user_id,
-#         cast(DayPlan.date, Date) == date_obj
-#     )
-#     result = await session.execute(query)
-#     dayplan = result.scalars().all()
-
-#     if not dayplan:
-#         return {}
-#     return DayPlanResponse(dayplan[-1])
-# @router.put("", response_model=DayPlanResponse)
-# async def edit_dayplan(
-#     dayplan_id: str,
-#     dayplan_update: DayPlanCreateRequest,  # This Pydantic model should represent the editable fields of a DayPlan
-#     session: AsyncSession = Depends(deps.get_session),
-#     current_user: User = Depends(deps.get_current_user),
-# ):
-#     # Convert dayplan_id to a UUID object if necessary
-#     try:
-#         # Attempt to fetch the specific DayPlan instance by ID
-#         query = select(DayPlan).filter_by(id=dayplan_id, user_id=current_user.id)
-#         result = await session.execute(query)
-#         dayplan = result.scalars().one()
-#     except :
-#         raise HTTPException(status_code=404, detail="DayPlan not found")
-
-#     # Update the DayPlan instance with the provided data
-#     for var, value in vars(dayplan_update).items():
-#         setattr(dayplan, var, value) if value else None
-
-#     session.add(dayplan)
-#     await session.commit()
-#     await session.refresh(dayplan)
-
-#     return DayPlanResponse.from_orm(dayplan)
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -126,21 +43,34 @@ async def update_habits(
     habits: List[HabitCreateRequest],
     session: AsyncSession = Depends(deps.get_session),
     current_user: User = Depends(deps.get_current_user),
-
 ):
-    updated_habits = []
-    for habit_data in habits:
-        habit_id = habit_data.id  # Assuming HabitCreateRequest has an 'id' field
-        habit = await session.get(Habit, habit_id)
-        if not habit:
-            raise HTTPException(status_code=404, detail=f"Habit {habit_id} not found")
-        habit.name = habit_data.name
-        await session.commit()
-        updated_habits.append({
+    # Step 1: Delete all existing habits for the current user
+    await session.execute(
+        delete(Habit).where(Habit.user_id == current_user.id)
+    )
+
+    # Step 2: Add new habits based on the provided data
+    new_habits = [
+        Habit(
+            name=habit_data.name,
+            user_id=current_user.id,
+            frequency=habit_data.frequency  # Use the ID of the current user
+        ) for habit_data in habits
+    ]
+
+    session.add_all(new_habits)
+    await session.commit()
+
+    # Step 3: Prepare the response with the newly added habits
+    updated_habits = [
+        {
             "id": habit.id,
             "name": habit.name,
-            "user_id": habit.user_id
-        })
+            "user_id": habit.user_id,
+            "frequency": habit.frequency
+        } for habit in new_habits
+    ]
+
     return updated_habits
 
 @router.delete("/{habit_id}")

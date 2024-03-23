@@ -1,9 +1,9 @@
 from pydantic import BaseModel, ConfigDict, EmailStr
-from typing import List, Optional
+from typing import List, Optional,Dict,Any
 from uuid import UUID
 from datetime import time
 from datetime import  date as datex
-
+from datetime import datetime
 from app.models import Activity
 
 class BaseResponse(BaseModel):
@@ -37,10 +37,15 @@ class ActivityResponse(BaseResponse):
     class Config:
         from_attributes = True
         arbitrary_types_allowed = True
+class ActivitySchema(BaseModel):
+    plannedStart:Optional[datetime]=None
+    plannedEnd: Optional[datetime]= None
+    activity: Optional[str]
+    # Add other fields here
 
 class DayPlanResponse(BaseResponse):
     id: Optional[UUID]=None
-    dayplan:  Optional[list["Activity"] ]=""
+    dayplan:  Optional[list[ActivitySchema] ]=[]
     date: Optional[datex]=""
     total_score:Optional[int]=""
     full_score:Optional[int]=""
@@ -88,3 +93,14 @@ class OrderResponse(BaseModel):
     order_time: Optional[str] = None
     ready_time: Optional[str] = None
     delivery_time: Optional[str] = None
+
+
+class TodayPlanResponse(BaseModel):
+    date: datex
+    full_score: int
+    current_score: int
+    activities: List[Dict[str, Any]]
+    habits: List[Dict[str, Any]]
+    
+    class Config:
+        orm_mode = True

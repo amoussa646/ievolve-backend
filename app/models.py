@@ -104,4 +104,15 @@ class Habit(Base):
         ForeignKey("users.id", ondelete="CASCADE")
     )
     name : Mapped[str] = mapped_column(String(20), nullable=True)
-    
+    frequency  : Mapped[str] = mapped_column(String(20), nullable=True)    
+
+class TodayPlan(Base):
+    __tablename__ = "today"
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE")
+    )
+    date = Column(Date, primary_key=True, index=True)
+    full_score = Column(Integer)
+    current_score = Column(Integer)
+    activities = Column(JSON)  # Store activities as a JSON list
+    habits = Column(JSON) 
