@@ -16,8 +16,8 @@ alembic upgrade head
 import uuid
 from typing import List
 
-from sqlalchemy import String, Boolean, DateTime, ForeignKey, Integer, JSON,ARRAY, Date, Time
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Integer, JSON,ARRAY, Date, Time
+from sqlalchemy.dialects.postgresql import UUID , JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from datetime import datetime
 
@@ -59,7 +59,6 @@ class User(Base):
     last_login: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
     created_at: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
     new_user: Mapped[bool] = mapped_column(Boolean, nullable=True)
-
 class Activity(Base):
     __tablename__ = "activity"
 
@@ -69,66 +68,51 @@ class Activity(Base):
     user_id: Mapped[str] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE")
     )
-    date: Mapped[str] = mapped_column(Date,nullable=True)  # New date column for activity date
-    start: Mapped[str] = mapped_column(Time,nullable=True)  # Adjusted to Time type
-    end: Mapped[str] = mapped_column(Time,nullable=True)  # Adjusted to Time type
-    activity: Mapped[str] = mapped_column(String(20),nullable=True)
-    duration: Mapped[str] = mapped_column(Integer,nullable=True)
-# class Item(Base):
-#     __tablename__ = "item"
+    date: Mapped[Date] = mapped_column(Date, nullable=True)
+    start: Mapped[Time] = mapped_column(Time, nullable=True)
+    end: Mapped[Time] = mapped_column(Time, nullable=True)
+    activity: Mapped[str] = mapped_column(String(20), nullable=True)
+    duration: Mapped[int] = mapped_column(Integer, nullable=True)
 
-#     id: Mapped[str] = mapped_column(
-#         UUID(as_uuid=False), primary_key=True, default=lambda _: str(uuid.uuid4())
-#     )
-#     name: Mapped[str] = mapped_column(String(50), nullable=True)
-#     chef_id: Mapped[str] = mapped_column(
-#         ForeignKey("chef.id", ondelete="CASCADE"),
-#     )
-#     chef : Mapped[Chef]= relationship('Chef', back_populates='items')
-#     description: Mapped[str] = mapped_column(String(300), nullable=True)
-#     ingredients: Mapped[str] = mapped_column(String(300), nullable=True)
-#     image_url: Mapped[str] = mapped_column(String(200), nullable=True)
-#     price: Mapped[str] = mapped_column(String(200), nullable=False)
-#     category: Mapped[str] = mapped_column(String(200), nullable=True)
-#     sub_category: Mapped[str] = mapped_column(String(200), nullable=True)
-#     rating: Mapped[str]= mapped_column(String, nullable=True)
-#     totalRatings: Mapped[str]= mapped_column(String, nullable=True)
-#     reviews: Mapped[List[str]] = mapped_column(ARRAY(String), nullable=True)
-#     extra_attributes: Mapped[JSON]= mapped_column(JSON, nullable=True)
-#     is_approved: Mapped[bool] = mapped_column(Boolean, nullable=True)
-#     is_active: Mapped[bool] = mapped_column(Boolean, nullable=True)
+class DayPlan(Base):
+    __tablename__ = "day_plan"
 
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE")
+    )
+    date: Mapped[Date] = mapped_column(Date, nullable=True)
+    dayplan = Column(JSONB, nullable=True)
+    # Relationship to Activity
+    full_score:Mapped[int] = mapped_column(Integer, nullable=True)
+    total_score:Mapped[int] = mapped_column(Integer, nullable=True)
+    # New date column for activity date
+    # start: Mapped[str] = mapped_column(Time,nullable=True)  # Adjusted to Time type
+    # end: Mapped[str] = mapped_column(Time,nullable=True)  # Adjusted to Time type
+    # activity: Mapped[str] = mapped_column(String(20),nullable=True)
+    # duration: Mapped[str] = mapped_column(Integer,nullable=True)
 
+class Habit(Base):
+    __tablename__ = "habit"
 
-# class Order(Base):
-#     __tablename__ = "orders"
+    id: Mapped[str] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE")
+    )
+    name : Mapped[str] = mapped_column(String(20), nullable=True)
+    frequency  : Mapped[str] = mapped_column(String(20), nullable=True)    
 
-#     id: Mapped[str] = mapped_column(
-#         UUID(as_uuid=False), primary_key=True, default=lambda _: str(uuid.uuid4())
-#     )
-#     total_price: Mapped[str] = mapped_column(String(50), nullable=True)
-#     final_price: Mapped[str] = mapped_column(String(50), nullable=True)
-#     delivery_cost: Mapped[str] = mapped_column(String(50), nullable=True)
-#     tax_service: Mapped[str] = mapped_column(String(50), nullable=True)
-#     chef_id: Mapped[str] = mapped_column(
-#         ForeignKey("chef.id", ondelete="CASCADE"),
-#     )
-#     user_id: Mapped[str] = mapped_column(
-#         ForeignKey("users.id", ondelete="CASCADE"),
-#     )
-#     is_chef_recieved: Mapped[bool] = mapped_column(Boolean, nullable=True)
-#     is_chef_accepted: Mapped[bool] = mapped_column(Boolean, nullable=True)
-#     is_chef_prepared: Mapped[bool] = mapped_column(Boolean, nullable=True)
-#     is_delivery_recieved: Mapped[bool] = mapped_column(Boolean, nullable=True)
-#     is_delivery_accepted: Mapped[bool] = mapped_column(Boolean, nullable=True)
-#     is_delivery_delivered: Mapped[bool] = mapped_column(Boolean, nullable=True)
-#     is_paid: Mapped[bool] = mapped_column(Boolean, nullable=True)
-#     payment_method: Mapped[str] = mapped_column(String(50), nullable=True)
-#     status:  Mapped[str] = mapped_column(String(50), nullable=True)
-#     oder_time:Mapped[str] = mapped_column(String(50), nullable=True)
-#     ready_time:Mapped[str] = mapped_column(String(50), nullable=True)
-#     delivery_time:Mapped[str] = mapped_column(String(50), nullable=True)
-#     # items: Mapped[List['OrderItem']] = relationship('OrderItem', back_populates='order')
-#     items_ids: Mapped[List[str]] = mapped_column(ARRAY(String), nullable=True)
-#     quantities : Mapped[List[str]] = mapped_column(ARRAY(String), nullable=True)
-    
+class TodayPlan(Base):
+    __tablename__ = "today"
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE")
+    )
+    date = Column(Date, primary_key=True, index=True)
+    full_score = Column(Integer)
+    current_score = Column(Integer)
+    activities = Column(JSON)  # Store activities as a JSON list
+    habits = Column(JSON) 

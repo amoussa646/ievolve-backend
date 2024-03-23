@@ -1,7 +1,9 @@
 from pydantic import BaseModel, EmailStr
-from typing import List, Optional
+from typing import List, Optional,Dict,Any
 from datetime import datetime
 from datetime import date
+
+from app.models import Activity
 
 class BaseRequest(BaseModel):
     # may define additional fields or config shared across requests
@@ -38,6 +40,25 @@ class UserCreateRequest(BaseRequest):
 class ActivityCreateRequest(BaseRequest):
     start: str
     date:str
+class ActivitySchema(BaseModel):
+    start: datetime
+    end: datetime
+    activity: str
+    # Add other fields here
+
+class HabitCreateRequest(BaseModel):
+    id: Optional[str]
+    name: str
+    user_id: Optional[int] = None  # Assuming user_id is optional for creating a habit
+    frequency : Optional[str] = None
+
+class DayPlanSchema(BaseModel):
+    id:  Optional[str] = None
+    user_id:  Optional[str] = None
+    date:  Optional[str] = None
+    dayplan :Optional[List[ActivitySchema]]= []
+    class Config:
+        arbitrary_types_allowed = True
 
 class ActivitySchema(BaseModel):
     id:  Optional[str] = None
@@ -46,6 +67,8 @@ class ActivitySchema(BaseModel):
     start: Optional[str] = None
     end: Optional[str] = None
     activity: Optional[str] = None
+    class Config:
+        arbitrary_types_allowed = True
 
 class ActivityEndRequest(BaseRequest):
     id: str
@@ -53,25 +76,12 @@ class ActivityEndRequest(BaseRequest):
     activity: str
     duration: str
 
-class ItemCreateRequest(BaseModel):
-    name: str
-    price : str
-    description: Optional[str] = None  # Make description optional
-    ingredients: Optional[str] = None  # Make ingredients optional
-    image_url: Optional[str] = None  # Make image_url optional
-    category: Optional[str] = None  # Make category optional
-    sub_category: Optional[str] = None  # Make sub_category optional
-    extra_attributes: Optional[dict] = None
+    ########################################today's stuff #####################################33
 
-class OrderCreateRequest(BaseModel):
-    chef_id: str
-    items_ids: List[str]
-    quantities: List[str]
-    total_price: str
-    final_price: str
-    delivery_cost: str
-    tax_service : str
-
-
-
-    
+class TodayPlanCreate(BaseModel):
+    date: Optional[str]= None
+    full_score: int
+    current_score: int
+    activities: List[Dict[str, Any]]  # List of activities as dictionaries
+    habits: List[Dict[str, Any]]  # List of habits as dictionaries
+    user_id: Optional[int] = None
