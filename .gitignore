@@ -8,7 +8,7 @@ test_database_data
 __pycache__/
 *.py[cod]
 *$py.class
-.env
+
 
 # C extensions
 *.so

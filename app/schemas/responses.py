@@ -48,10 +48,10 @@ class DayPlanResponse(BaseResponse):
         from_attributes = True
         arbitrary_types_allowed = True
 
-class HabitResponse(BaseResponse):
-    name: Optional[str]=""
-
-   
+class HabitResponse(BaseModel):
+    id: int
+    name: str
+    user_id: int
 
 
 class ItemResponse(BaseModel):
